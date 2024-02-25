@@ -1,4 +1,5 @@
 'use client';
+import { useFormState } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
@@ -13,18 +14,32 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-export function AddForm() {
-  const form = useForm();
+export function AddForm({ createTicket }) {
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      message: '',
+    },
+  });
   const router = useRouter();
 
-  function onSubmit(data) {
-    console.log(data);
-    router.push('/success');
-  }
+  const onSubmit = async (data) => {
+    try {
+      const response = await createTicket(data);
+      // Handle response (e.g., display success message)
+      console.log('Ticket created successfully:', response);
+      router.push('/success');
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      // Handle error (e.g., display error message)
+    }
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+        {/* <form action={createTicket} className="w-2/3 space-y-6"> */}
         <FormField
           control={form.control}
           name="name"
@@ -86,3 +101,25 @@ export function AddForm() {
     </Form>
   );
 }
+
+// async function onSubmit(data) {
+//   try {
+//     const response = await fetch('/api/create-ticket', {
+//       method: 'POST',
+//       body: JSON.stringify(data),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error('Failed to submit form');
+//     }
+
+//     const { message, ticketId } = await response.json();
+//     console.log(message, ticketId); // Handle success message and ticket ID
+
+//     // Reset form or redirect to success page
+//     router.push('/success');
+//   } catch (error) {
+//     console.error('Error submitting form:', error);
+//     // Handle errors here
+//   }
+// }

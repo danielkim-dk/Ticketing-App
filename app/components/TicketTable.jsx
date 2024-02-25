@@ -11,8 +11,25 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default function TicketTable() {
+export default function TicketTable({ tickets }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+
+  const calculateDaysPending = (ticketDate) => {
+    const submittedDate = new Date(ticketDate);
+    const currentDate = new Date();
+    // Set the time part to 00:00:00 for both dates
+    submittedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+    const timeDifference = currentDate - submittedDate;
+    const daysPending = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    return daysPending;
+  };
+
+  const handleRowClick = (ticket) => {
+    setSelectedTicket(ticket);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
@@ -24,24 +41,32 @@ export default function TicketTable() {
             <TableHead>Status</TableHead>
             <TableHead>Date Submitted</TableHead>
             <TableHead>Days Pending</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="text-right">Message</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow
-            onClick={() => {
-              setIsModalOpen(true);
-            }}
-          >
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>New</TableCell>
-            <TableCell>Feb 22, 2024</TableCell>
-            <TableCell>1</TableCell>
-            <TableCell className="text-right">$250.00</TableCell>
-          </TableRow>
+          {tickets &&
+            tickets.map((ticket) => (
+              <TableRow
+                key={ticket.ticketid}
+                onClick={() => handleRowClick(ticket)}
+              >
+                <TableCell className="font-medium">{ticket.ticketid}</TableCell>
+                <TableCell>{ticket.status}</TableCell>
+                <TableCell>
+                  {new Date(ticket.ticketdate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{calculateDaysPending(ticket.ticketdate)}</TableCell>
+                <TableCell className="text-right">{ticket.message}</TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
-      <TicketModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <TicketModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        ticket={selectedTicket}
+      />
     </>
   );
 }

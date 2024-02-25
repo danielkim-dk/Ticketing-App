@@ -1,69 +1,43 @@
-"use server";
+'use server';
 
-const { revalidatePath } = require("next/cache");
-const postgres = require("postgres");
-const { z } = require("zod");
+import { sql } from '@vercel/postgres';
+import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 
-let sql = postgres(process.env.DATABASE_URL || process.env.POSTGRES_URL, {
-  ssl: "allow",
-});
-
-// CREATE TABLE todos (
-//   id SERIAL PRIMARY KEY,
-//   text TEXT NOT NULL
-// );
-
-async function createTodo(prevState, formData) {
-  const schema = z.object({
-    todo: z.string().min(1),
-  });
-  const parse = schema.safeParse({
-    todo: formData.get("todo"),
-  });
-
-  if (!parse.success) {
-    return { message: "Failed to create todo" };
-  }
-
-  const data = parse.data;
+export async function createTicket({ name, email, message }) {
+  console.log('inside createTicket action', { name, email, message });
 
   try {
-    await sql`
-      INSERT INTO todos (text)
-      VALUES (${data.todo})
+    const result = await sql`
+      INSERT INTO Tickets (Name, Email, Message)
+      VALUES (${name}, ${email}, ${message})
+      RETURNING TicketID
     `;
 
-    revalidatePath("/");
-    return { message: `Added todo ${data.todo}` };
-  } catch (e) {
-    return { message: "Failed to create todo" };
+    const ticketID = result.rows[0].ticketid;
+    console.log(ticketID);
+    // Return response with ticketID
+    revalidatePath('/admin/current');
+    return {
+      message: `Ticket created successfully`,
+      ticketID,
+    };
+  } catch (error) {
+    console.error('Failed to create ticket:', error);
+    return { message: `Failed to create ticket: ${error.message}` };
   }
 }
 
-async function deleteTodo(prevState, formData) {
-  const schema = z.object({
-    id: z.string().min(1),
-    todo: z.string().min(1),
-  });
-  const data = schema.parse({
-    id: formData.get("id"),
-    todo: formData.get("todo"),
-  });
-
+export async function getTickets() {
   try {
-    await sql`
-      DELETE FROM todos
-      WHERE id = ${data.id};
+    const result = await sql`
+    SELECT * FROM Tickets WHERE Status = 'New' OR Status = 'Pending'
     `;
-
-    revalidatePath("/");
-    return { message: `Deleted todo ${data.todo}` };
-  } catch (e) {
-    return { message: "Failed to delete todo" };
+    console.log(result.rows);
+    revalidatePath('/admin/current');
+    return result.rows;
+  } catch (error) {
+    console.error('Failed to get tickets:', error);
+    return [];
   }
 }
-
-module.exports = {
-  createTodo,
-  deleteTodo,
-};

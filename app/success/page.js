@@ -1,12 +1,18 @@
-import Link from "next/link";
+'use client';
+import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 
+export default function SuccessPage() {
+  const router = useRouter();
+  const ticketID = router.query ? router.query.ticketID : null;
 
-export default function AdminPage() {
   return (
-      <div className="flex justify-around p-36 border-2">
-        <div>Success</div>
-        <Link href="/">Back to Home</Link>
-      </div>
-
+    <div className="flex justify-around p-36 border-2">
+      <div>Success</div>
+      {ticketID && (
+        <p>Your ticket has been created successfully. Ticket ID: {ticketID}</p>
+      )}
+      <Link href="/">Back to Home</Link>
+    </div>
   );
 }
