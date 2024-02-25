@@ -39,7 +39,6 @@ export function AddForm({ createTicket }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        {/* <form action={createTicket} className="w-2/3 space-y-6"> */}
         <FormField
           control={form.control}
           name="name"
