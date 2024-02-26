@@ -1,6 +1,6 @@
 import { getTicketCounts } from '@/app/actions';
 import TicketStatusChart from '@/app/components/TicketStatusChart';
-
+export const dynamic = "force-dynamic"
 export default async function AdminPage() {
   const ticketCounts = await getTicketCounts();
 

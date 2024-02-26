@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export default function TicketTable({ tickets }) {
+export default function TicketTable({ tickets, updateTickets }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
 
@@ -89,7 +89,10 @@ export default function TicketTable({ tickets }) {
       </Table>
       <TicketModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          updateTickets();
+        }}
         ticket={selectedTicket}
       />
     </>

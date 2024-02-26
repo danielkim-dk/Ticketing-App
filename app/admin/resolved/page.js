@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import TicketTable from '@/app/components/TicketTable';
 import { getResolvedTickets } from '@/app/actions';
-
+export const dynamic = "force-dynamic"
 const CurrentPage = () => {
   const [tickets, setTickets] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
