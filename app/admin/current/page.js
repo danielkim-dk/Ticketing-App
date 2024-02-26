@@ -4,11 +4,10 @@ import { getTickets } from '@/app/actions';
 
 const CurrentPage = async () => {
   const tickets = await getTickets();
-  console.log('tickets data in page', tickets)
   return (
-    <div className="flex flex-col items-center h-screen">
-      <div className="p-36">CurrentPage</div>
-      <div className="flex items-center w-10/12">
+    <div className="flex flex-col items-center h-full">
+      <div className="p-12 font-bold">Current Page</div>
+      <div className="flex items-center w-full">
         <TicketTable tickets={tickets} />
       </div>
     </div>

@@ -1,15 +1,15 @@
-import React from 'react';
+'use client';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { updateTicket } from '@/app/actions';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -30,27 +30,51 @@ import {
 export default function TicketModal({ isOpen, onClose, ticket }) {
   const form = useForm();
 
-  function onSubmit(data) {
-    if (data.status === 'new') {
-      console.log('Saving status as new', data);
+  useEffect(() => {
+    if (ticket) {
+      form.reset({
+        status: ticket.status,
+        response: '',
+      });
     }
-    if (data.status === 'pending') {
-      console.log('Saving status as pending', data);
+  }, [ticket, form]);
+  const onSubmit = async (data) => {
+    const updatedTicket = {
+      ...ticket,
+      status: data.status,
+      response: data.response,
+      responseDate: new Date().toISOString(),
+    };
+    try {
+      const response = await updateTicket(updatedTicket);
+
+      if (response.success) {
+        if (data.status === 'Resolved') {
+          console.log(
+            'Emailing Client Response and sending ticket to resolved',
+            response
+          );
+        } else {
+          console.log('Ticket updated successfully', response);
+        }
+        onClose();
+      } else {
+        console.error('Error updating ticket:', response.message);
+      }
+    } catch (error) {
+      console.error('Error updating ticket:', error);
     }
-    if (data.status === 'resolved') {
-      console.log(
-        'Saving status as resolved and sending email with body: ',
-        data.response
-      );
-    }
-    onClose();
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="xs:max-w-[425px] md:max-w-[700px] lg:max-w-[900px] max-h-[900px] overflow-auto ">
         <DialogHeader>
-          <DialogTitle>Edit Ticket</DialogTitle>
+          {ticket && ticket.status === 'Resolved' ? (
+            <DialogTitle>Resolved Ticket</DialogTitle>
+          ) : (
+            <DialogTitle>Edit Ticket</DialogTitle>
+          )}
           <DialogDescription>
             Ticket Number: {ticket && ticket.ticketid}
           </DialogDescription>
@@ -68,8 +92,16 @@ export default function TicketModal({ isOpen, onClose, ticket }) {
                   <FormItem>
                     <FormLabel>Status</FormLabel>
                     <Select
+                      onOpenChange={(open) => {
+                        if (open) {
+                          document.body.style.overflow = 'hidden';
+                        } else {
+                          document.body.style.overflow = 'hidden';
+                        }
+                      }}
                       onValueChange={field.onChange}
                       defaultValue={ticket.status}
+                      disabled={ticket.status === 'Resolved'}
                     >
                       <FormControl>
                         <SelectTrigger className="w-[180px]">
@@ -86,36 +118,58 @@ export default function TicketModal({ isOpen, onClose, ticket }) {
                   </FormItem>
                 )}
               />
-              <div>
-                <h1> Ticket Message</h1>
-                <div className="flex h-36 border-2 w-full">
-                  <p>{ticket.message}</p>
+              <div className="space-y-2">
+                <p className="text-sm font-medium"> Ticket Message</p>
+                <div className="flex h-36 border border-stone-200	w-full shadow-sm rounded-md">
+                  <p className="text-left w-full break-all overflow-auto p-2 text-sm text-stone-500">
+                    {ticket.message}
+                  </p>
                 </div>
               </div>
-              <FormField
-                control={form.control}
-                name="response"
-                rules={{
-                  required: { value: true, message: 'Message is needed' },
-                }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Your Response</FormLabel>
-                    <FormControl>
-                      <div className="grid w-full gap-2">
-                        <Textarea
-                          placeholder="Type your response here."
-                          {...field}
-                          rows="5"
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {ticket.status === 'Resolved' ? (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Your Response</p>
+                  <div className="flex h-36 border w-full">
+                    <p className="text-left w-full break-all overflow-auto p-2 text-sm text-stone-500">
+                      {ticket.response}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="response"
+                  rules={{
+                    required: { value: true, message: 'Message is needed' },
+                  }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Your Response</FormLabel>
+                      <FormControl>
+                        <div className="grid w-full gap-2">
+                          <Textarea
+                            placeholder="Type your response here."
+                            {...field}
+                            rows="5"
+                            className="text-left w-full break-all overflow-auto shadow-sm"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <div className="flex w-full justify-end">
-                <Button type="submit">Submit</Button>
+                {ticket.status === 'Resolved' ? (
+                  <Button type="button" onClick={onClose} className="shadow-sm">
+                    Close
+                  </Button>
+                ) : (
+                  <Button type="submit" className="shadow-sm">
+                    Submit
+                  </Button>
+                )}
               </div>
             </form>
           </Form>

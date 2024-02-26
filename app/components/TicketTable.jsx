@@ -4,7 +4,6 @@ import TicketModal from './TicketModal';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -18,11 +17,10 @@ export default function TicketTable({ tickets }) {
   const calculateDaysPending = (ticketDate) => {
     const submittedDate = new Date(ticketDate);
     const currentDate = new Date();
-    // Set the time part to 00:00:00 for both dates
-    submittedDate.setHours(0, 0, 0, 0);
-    currentDate.setHours(0, 0, 0, 0);
     const timeDifference = currentDate - submittedDate;
-    const daysPending = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    const daysPending = Math.abs(
+      Math.floor(timeDifference / (1000 * 60 * 60 * 24))
+    );
     return daysPending;
   };
 
@@ -34,14 +32,27 @@ export default function TicketTable({ tickets }) {
   return (
     <>
       <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Ticket Number</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Date Submitted</TableHead>
-            <TableHead>Days Pending</TableHead>
-            <TableHead className="text-right">Message</TableHead>
+            <TableHead className="text-center font-bold min-w-[60px] pl-2 max-w-[60px]">
+              Ticket Number
+            </TableHead>
+            <TableHead className="text-center font-bold">Status</TableHead>
+            <TableHead className="text-center font-bold">
+              Date Submitted
+            </TableHead>
+            <TableHead className="text-center font-bold">
+              Days Pending
+            </TableHead>
+            <TableHead className="text-center font-bold min-w-[300px]">
+              Message
+            </TableHead>
+            <TableHead className="text-center font-bold">
+              Response Date
+            </TableHead>
+            <TableHead className="text-center font-bold min-w-[300px]">
+              Response Message
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -51,13 +62,27 @@ export default function TicketTable({ tickets }) {
                 key={ticket.ticketid}
                 onClick={() => handleRowClick(ticket)}
               >
-                <TableCell className="font-medium">{ticket.ticketid}</TableCell>
-                <TableCell>{ticket.status}</TableCell>
-                <TableCell>
+                <TableCell className="text-center font-medium">
+                  {ticket.ticketid}
+                </TableCell>
+                <TableCell className="text-center">{ticket.status}</TableCell>
+                <TableCell className="text-center">
                   {new Date(ticket.ticketdate).toLocaleDateString()}
                 </TableCell>
-                <TableCell>{calculateDaysPending(ticket.ticketdate)}</TableCell>
-                <TableCell className="text-right">{ticket.message}</TableCell>
+                <TableCell className="text-center">
+                  {calculateDaysPending(ticket.ticketdate)}
+                </TableCell>
+                <TableCell className="text-center w-[400px] overflow-hidden whitespace-nowrap text-overflow:ellipsis;">
+                  {ticket.message}
+                </TableCell>
+                <TableCell className="text-center">
+                  {ticket.responsedate
+                    ? new Date(ticket.responsedate).toLocaleDateString()
+                    : 'N/A'}
+                </TableCell>
+                <TableCell className="text-center w-[400px] overflow-hidden whitespace-nowrap text-overflow:ellipsis; ">
+                  {ticket.response || 'N/A'}
+                </TableCell>
               </TableRow>
             ))}
         </TableBody>

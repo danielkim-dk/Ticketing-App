@@ -1,7 +1,6 @@
-import { sql } from '@vercel/postgres';
-import { NextResponse } from 'next/server';
+const { sql } = require('@vercel/postgres');
 
-export async function initDB() {
+async function initDB() {
   try {
     const ticketStatusEnumExists = await sql`
       SELECT EXISTS (
@@ -19,11 +18,10 @@ export async function initDB() {
       Email varchar(255) NOT NULL,
       Status ticket_status DEFAULT 'New',
       Message varchar(500),
-      Response varchar(500),
+      Response varchar(2000),
       TicketDate timestamp DEFAULT CURRENT_TIMESTAMP,
       ResponseDate timestamp
     );`;
-
 
     console.log('Tables created successfully');
   } catch (error) {
@@ -31,3 +29,10 @@ export async function initDB() {
     throw new Error('Error initializing database');
   }
 }
+
+initDB().catch((error) => {
+  console.error('Error initializing database:', error);
+  process.exit(1);
+});
+
+module.exports = { initDB };

@@ -1,14 +1,17 @@
 import React from 'react';
 import TicketTable from '@/app/components/TicketTable';
-const ResolvedPage = () => {
+import { getResolvedTickets } from '@/app/actions';
+
+const CurrentPage = async () => {
+  const tickets = await getResolvedTickets();
   return (
-    <div className="flex flex-col items-center h-screen">
-      <div className="p-36">Resolved Page</div>
-      <div className="flex items-center w-10/12">
-        <TicketTable />
+    <div className="flex flex-col items-center h-full">
+      <div className="p-12 font-bold">Resolved Page</div>
+      <div className="flex items-center w-full">
+        <TicketTable tickets={tickets} />
       </div>
     </div>
   );
 };
 
-export default ResolvedPage;
+export default CurrentPage;

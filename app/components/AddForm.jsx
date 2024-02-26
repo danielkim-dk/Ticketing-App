@@ -1,10 +1,11 @@
 'use client';
-import { useFormState } from 'react-dom';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+
 import {
   Form,
   FormControl,
@@ -15,6 +16,8 @@ import {
 } from '@/components/ui/form';
 
 export function AddForm({ createTicket }) {
+  const maxLength = 500;
+  const [messageLength, setMessageLength] = useState(0);
   const form = useForm({
     defaultValues: {
       name: '',
@@ -27,13 +30,21 @@ export function AddForm({ createTicket }) {
   const onSubmit = async (data) => {
     try {
       const response = await createTicket(data);
-      // Handle response (e.g., display success message)
-      console.log('Ticket created successfully:', response);
-      router.push('/success');
+      if (response.success) {
+        console.log('Ticket created successfully:');
+        router.push('/success');
+      } else {
+        console.error('Error creating ticket:', response.message);
+      }
     } catch (error) {
       console.error('Error creating ticket:', error);
-      // Handle error (e.g., display error message)
     }
+  };
+
+  const handleChange = (event) => {
+    const value = event.target.value.slice(0, maxLength);
+    setMessageLength(value.length);
+    form.setValue('message', value);
   };
 
   return (
@@ -76,13 +87,20 @@ export function AddForm({ createTicket }) {
           rules={{ required: { value: true, message: 'Message is needed' } }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Your Message</FormLabel>
+              <div className="flex justify-between pt-1">
+                <FormLabel>Your Message</FormLabel>
+                <FormLabel>
+                  Remaining Characters: {maxLength - messageLength}
+                </FormLabel>
+              </div>
               <FormControl>
                 <div className="grid w-full gap-2">
                   <Textarea
                     placeholder="Type your message here."
                     {...field}
                     rows="5"
+                    maxLength={maxLength}
+                    onChange={handleChange}
                   />
                   <p className="text-sm text-muted-foreground">
                     Your message will be sent to the support team.
@@ -100,25 +118,3 @@ export function AddForm({ createTicket }) {
     </Form>
   );
 }
-
-// async function onSubmit(data) {
-//   try {
-//     const response = await fetch('/api/create-ticket', {
-//       method: 'POST',
-//       body: JSON.stringify(data),
-//     });
-
-//     if (!response.ok) {
-//       throw new Error('Failed to submit form');
-//     }
-
-//     const { message, ticketId } = await response.json();
-//     console.log(message, ticketId); // Handle success message and ticket ID
-
-//     // Reset form or redirect to success page
-//     router.push('/success');
-//   } catch (error) {
-//     console.error('Error submitting form:', error);
-//     // Handle errors here
-//   }
-// }

@@ -1,8 +1,8 @@
-import { Inter } from 'next/font/google';
+import { Manrope } from 'next/font/google';
 import '../globals.css';
 import Navbar from '../components/Navbar';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Manrope({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Zealthy Admin Page',
@@ -10,10 +10,15 @@ export const metadata = {
 };
 export default function AdminLayout({ children }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 min-h-screen">
-      <Navbar />
-      <div className="col-span-1 md:col-span-10">
-        <section className="p-4 md:p-0">{children}</section>
+    <div className="flex flex-col md:flex-row h-screen min-h-screen w-screen">
+      <div className=" bg-gray-200 md:h-screen shadow-xl">
+        <Navbar />
+      </div>
+
+      <div className="md:w-full flex justify-center">
+        <div className="w-11/12">
+          <section className="md:p-0">{children}</section>
+        </div>
       </div>
     </div>
   );
