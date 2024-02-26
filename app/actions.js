@@ -34,6 +34,7 @@ export async function getTickets() {
     SELECT * FROM Tickets WHERE Status = 'New' OR Status = 'Pending'
     `;
     return result.rows;
+    revalidatePath('/admin/current');
   } catch (error) {
     console.error('Failed to get tickets:', error);
     return [];
@@ -101,7 +102,7 @@ export async function getTicketCounts() {
       acc[row.status] = row.count;
       return acc;
     }, {});
-
+    revalidatePath('/admin');
     return {
       success: true,
       counts,
