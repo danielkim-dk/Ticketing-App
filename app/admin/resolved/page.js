@@ -8,7 +8,7 @@ const CurrentPage = async () => {
     <div className="flex flex-col items-center h-full">
       <div className="p-12 font-bold">Resolved Page</div>
       <div className="flex items-center w-full">
-        <TicketTable tickets={tickets} />
+        {!tickets ? <div>Loading...</div> : <TicketTable tickets={tickets} />}
       </div>
     </div>
   );
