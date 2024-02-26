@@ -9,7 +9,7 @@ async function initDB() {
     `;
 
     if (!ticketStatusEnumExists[0].exists) {
-      await sql`CREATE TYPE ticket_status AS ENUM ('New', 'Pending', 'Resolved');`;
+      await sql`CREATE TYPE ticket_status AS ENUM ('New', 'In Progress', 'Resolved');`;
     }
 
     await sql`CREATE TABLE IF NOT EXISTS Tickets (

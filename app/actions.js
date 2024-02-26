@@ -31,7 +31,7 @@ export async function createTicket({ name, email, message }) {
 export async function getTickets() {
   try {
     const result = await sql`
-    SELECT * FROM Tickets WHERE Status = 'New' OR Status = 'Pending'
+    SELECT * FROM Tickets WHERE Status = 'New' OR Status = 'In Progress'
     `;
 
     if (result.rows.length > 0) {

@@ -15,7 +15,7 @@ Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const TicketStatusChart = ({ ticketCounts }) => {
   const chartData = {
-    labels: ['New', 'Pending', 'Resolved'],
+    labels: ['New', 'In Progress', 'Resolved'],
     datasets: [
       {
         label: 'Tickets',
@@ -24,7 +24,7 @@ const TicketStatusChart = ({ ticketCounts }) => {
             ? parseInt(ticketCounts.counts['New'], 10) || 0
             : 0,
           ticketCounts && ticketCounts.counts
-            ? parseInt(ticketCounts.counts['Pending'], 10) || 0
+            ? parseInt(ticketCounts.counts['In Progress'], 10) || 0
             : 0,
           ticketCounts && ticketCounts.counts
             ? parseInt(ticketCounts.counts['Resolved'], 10) || 0
