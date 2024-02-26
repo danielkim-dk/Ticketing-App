@@ -75,9 +75,13 @@ export async function updateTicket({
 export async function getResolvedTickets() {
   try {
     const result = await sql`
-    SELECT * FROM Tickets WHERE Status = 'Resolved'
+      SELECT * FROM Tickets WHERE Status = 'Resolved'
     `;
-    revalidatePath('/admin/resolved');
+
+    if (result.rows[0].length > 0) {
+      revalidatePath('/admin/resolved');
+    }
+
     return result.rows;
   } catch (error) {
     console.error('Failed to get tickets:', error);
