@@ -51,11 +51,11 @@ export default function TicketModal({ isOpen, onClose, ticket }) {
       if (response.success) {
         if (data.status === 'Resolved') {
           console.log(
-            'Emailing Client Response and sending ticket to resolved',
-            response
+            'Would normally send email here with body:',
+            data.response
           );
         } else {
-          console.log('Ticket updated successfully', response);
+          console.log('Ticket updated successfully');
         }
         onClose();
       } else {
