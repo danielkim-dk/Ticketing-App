@@ -33,8 +33,12 @@ export async function getTickets() {
     const result = await sql`
     SELECT * FROM Tickets WHERE Status = 'New' OR Status = 'Pending'
     `;
+
+    if (result.rows.length > 0) {
+      revalidatePath('/admin/current');
+    }
+
     return result.rows;
-    revalidatePath('/admin/current');
   } catch (error) {
     console.error('Failed to get tickets:', error);
     return [];
@@ -102,7 +106,11 @@ export async function getTicketCounts() {
       acc[row.status] = row.count;
       return acc;
     }, {});
-    revalidatePath('/admin');
+
+    if (Object.keys(counts).length > 0) {
+      revalidatePath('/admin');
+    }
+
     return {
       success: true,
       counts,
