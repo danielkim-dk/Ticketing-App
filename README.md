@@ -1,4 +1,4 @@
-## Zealthy Ticketing Application
+## Ticketing Application
 
 ## Tech Used:
 
